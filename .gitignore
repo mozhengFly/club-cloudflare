@@ -216,3 +216,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# 签到脚本相关：下载的 login.py/login.enc 与含 token 的签到结果，严禁提交
+login.*
+sign_result.json
