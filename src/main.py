@@ -78,9 +78,15 @@ def load_unsigned_accounts() -> List[Dict[str, str]]:
 def setup_account_env(accounts: List[Dict[str, str]]) -> None:
     """
     按 login.py 的逻辑设置环境变量 ACCOUNT_PASSWORD：
-    账号列表 JSON 序列化后，用 ACCOUNT_AES_KEY（默认 login.DEFAULT_ACCOUNT_AES_KEY）AES 加密
+    账号列表 JSON 序列化后，用 ACCOUNT_AES_KEY（默认 login.DEFAULT_ACCOUNT_AES_KEY）AES 加密。
+
+    同时把生效密钥写回环境变量 ACCOUNT_AES_KEY：
+    GitHub Actions 未配置该 Secret 时环境变量为空字符串，
+    而 login.py 的 os.environ.get("ACCOUNT_AES_KEY", 默认值) 不回退空字符串，
+    会拿到 0 字节密钥并报 Incorrect AES key length (0 bytes)，因此这里统一归一化。
     """
-    key = os.environ.get("ACCOUNT_AES_KEY") or login.DEFAULT_ACCOUNT_AES_KEY
+    key = (os.environ.get("ACCOUNT_AES_KEY") or "").strip() or login.DEFAULT_ACCOUNT_AES_KEY
+    os.environ["ACCOUNT_AES_KEY"] = key
     cipher = AESCipher(key)
     os.environ["ACCOUNT_PASSWORD"] = cipher.encrypt(json.dumps(accounts, ensure_ascii=False))
 
