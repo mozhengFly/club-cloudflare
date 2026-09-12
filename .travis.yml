@@ -1,0 +1,28 @@
+# Travis CI 构建配置
+# 文档：https://docs.travis-ci.com/
+#
+# 手动触发方式（Travis 没有 workflow_dispatch，标准做法是调 API 触发）：
+#   1. 从 https://travis-ci.com/account/preferences 复制 API Token
+#   2. PowerShell 执行（repo 名中 owner/club-cloudflare 的 / 需写成 %2F）：
+#        $headers = @{
+#          "Content-Type"       = "application/json"
+#          "Accept"             = "application/json"
+#          "Travis-API-Version" = "3"
+#          "Authorization"      = "token <你的TRAVIS_TOKEN>"
+#        }
+#        Invoke-RestMethod -Method Post `
+#          -Uri "https://api.travis-ci.com/repo/<OWNER>%2Fclub-cloudflare/requests" `
+#          -Headers $headers -Body '{"request": {"branch": "main"}}'
+
+language: node_js
+dist: jammy          # Ubuntu 22.04（Node 24 官方二进制要求较新的 glibc）
+
+jobs:
+  include:
+    - name: "hello world"     # 任务名，显示在 Travis 构建页
+      if: type = api          # 仅手动（API）触发，push / PR 不触发；
+                              # 如需 push 也触发，改为 if: type IN (push, api)
+      node_js: "24"           # Node v24
+      install: skip           # hello world 无依赖，跳过默认的 npm install
+      script:
+        - node scripts/hello.js
