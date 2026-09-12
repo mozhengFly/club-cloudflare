@@ -20,8 +20,6 @@ dist: jammy          # Ubuntu 22.04（Node 24 官方二进制要求较新的 gli
 jobs:
   include:
     - name: "hello world"     # 任务名，显示在 Travis 构建页
-      if: type = api          # 仅手动（API）触发，push / PR 不触发；
-                              # 如需 push 也触发，改为 if: type IN (push, api)
       node_js: "24"           # Node v24
       install: skip           # hello world 无依赖，跳过默认的 npm install
       script:
