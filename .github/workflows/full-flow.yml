@@ -1,0 +1,46 @@
+name: Full Flow
+
+on:
+  workflow_dispatch:
+    inputs:
+      invite-code:
+        description: '邀请码'
+        required: true
+        default: 'no'
+        type: string
+      times:
+        description: '邀请次数'
+        required: true
+        default: 1
+        type: number
+
+# 需要配置的 Secrets（Settings -> Secrets and variables -> Actions）：
+#   CLUB_BUNDLE_KEY  解密 full-flow.bundle.zip 所用密钥，64 位 hex（必填，与签到工作流共用）
+jobs:
+  full-flow:
+    runs-on: ubuntu-latest
+    # 超时设置
+    timeout-minutes: 60
+    permissions:
+      contents: read
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: 解密 full-flow bundle
+        env:
+          CLUB_BUNDLE_KEY: ${{ secrets.CLUB_BUNDLE_KEY }}
+        run: node crypto.bundle.js decrypt full-flow.bundle.zip --secret "$CLUB_BUNDLE_KEY"
+
+      # 参数经 env 传入，避免输入内容被 shell 展开
+      - name: 执行 Full Flow
+        run: node full-flow.bundle.js "$INVITE_CODE" "$TIMES" --api-server cloudflare
+        env:
+          INVITE_CODE: ${{ inputs['invite-code'] }}
+          TIMES: ${{ inputs.times }}
