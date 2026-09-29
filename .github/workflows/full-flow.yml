@@ -33,6 +33,11 @@ jobs:
         with:
           node-version: "24"
 
+      - name: 下载 full-flow bundle
+        run: node download.js --tag v2.0.0 -a full-flow.bundle.zip
+        # download.js 从 v2.0.0 release 下载 full-flow.bundle.zip 到当前目录；
+        # 仓库自动取 GITHUB_REPOSITORY，下载失败会自动恢复并重试。
+
       - name: 解密 full-flow bundle
         env:
           CLUB_BUNDLE_KEY: ${{ secrets.CLUB_BUNDLE_KEY }}
