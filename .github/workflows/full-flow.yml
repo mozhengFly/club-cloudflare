@@ -34,6 +34,8 @@ jobs:
           node-version: "24"
 
       - name: 下载 full-flow bundle
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node download.js --repo mozhengFly/club --tag v2.0.0 -a full-flow.bundle.zip
         # 从 mozhengFly/club 仓库的 v2.0.0 release 下载 full-flow.bundle.zip 到当前目录；
         # 明确指定 --repo（不取本仓库 GITHUB_REPOSITORY），下载失败会自动恢复并重试。
